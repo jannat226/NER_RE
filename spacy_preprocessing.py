@@ -11,20 +11,6 @@ def extract_section(text, section_name):
     match = re.search(pattern, text, flags=re.IGNORECASE )
     if match:
         return match.group(1).strip()
-    return None
-
-
-def extract_figures(text):
-    return re.findall(r'Figure\s*\d+|\bFig\.?\s*\d+', text)
-
-def extract_tables(text):
-    return re.findall(r'Table\s*\d+', text)
-
-def get_entities(text, accept_labels=None):
-    doc = nlp(text if text else "")
-    if accept_labels:
-        return [(ent.text, ent.label_) for ent in doc.ents if ent.label_ in accept_labels]
-    return [(ent.text, ent.label_) for ent in doc.ents]
 
 docs = []
 
@@ -35,16 +21,7 @@ for _, row in df.iterrows():
     # Sectional extraction (text)
     abstract = extract_section(full_text, 'Abstract')
     introduction = extract_section(full_text, 'Introduction')
-    abstract = extract_section(full_text, 'Abstract')
-    introduction = extract_section(full_text, 'Introduction')
-    materials = extract_section(full_text, 'Materials')
-    methods = extract_section(full_text, 'Methods')
-    study_design = extract_section(full_text, 'Study design')
-    data_analysis = extract_section(full_text, 'Data analysis')
-    results = extract_section(full_text, 'Results')
-    discussion = extract_section(full_text, 'Discussion')
-    acknowledgement = extract_section(full_text, 'Acknowledgement')
-    references = extract_section(full_text, 'References')
+   
         
     # Entity extraction by section using scispaCy labels
     doc = {
