@@ -1,0 +1,14 @@
+*.json
+myenv/
+fast/
+venv/
+run.sh
+*log
+wandb/
+*.pkl
+checkpoints/
+results/
+predictions/
+config.yaml
+__pycache__/
+*.tar.gz
