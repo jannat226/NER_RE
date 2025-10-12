@@ -36,10 +36,10 @@ for paper in papers:
     try:
         entities = json.loads(pred_text.message.content)
     except Exception:
-        print(f"Failed to parse JSON for paper_id {paper['paper_id']}:")
-        print(pred_text.message.content)
-        entities = []
+        entities = pred_text.message.content  
+
     all_entities[paper['paper_id']] = entities
+    
 
 with open('ner_entities_using_llm.json', 'w', encoding='utf-8') as f:
     json.dump(all_entities, f, ensure_ascii=False, indent=2)
