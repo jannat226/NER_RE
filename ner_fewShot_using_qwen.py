@@ -20,6 +20,7 @@ all_entities = {}
 def extract_answer_after_think(text):
     # remove  <think> ... </think> 
     if '</think>' in text:
+
         split_text = text.split('</think>')
         return split_text[-1].strip()
     return text.strip()
@@ -31,16 +32,21 @@ for paper in papers:
         
     prompt = (
         "Extract all named entities from the following text. "
-        "For each entity, return a JSON object in this format:\n"
-        "{\n"
-        "  \"start\": <start_char index>,\n"
-        "  \"end\": <end_char index>,\n"
-        "  \"text_span\": <entity string from text>,\n"
-        "  \"label\": <entity type>\n"
-        "}\n"
-        "Return a JSON list of such objects. Do not add any explanation or extra text.\n\n"
+        "For each entity, provide a dictionary with the following keys: "
+        "\"start\" (character index where the entity begins), "
+        "\"end\" (character index where the entity ends), "
+        "\"text_span\" (the substring for the entity), and "
+        "\"label\" (the entity type)."
+        "\nOutput a JSON list ONLY. Do NOT include explanations, headers, 'entities:', or any extra text."
+        "\nExample:\n"
+        "[\n"
+        "  {\"start\": 16, \"end\": 39, \"text_span\": \"color-tunable ultralong\", \"label\": \"SIMPLE_CHEMICAL\"},\n"
+        "  {\"start\": 613, \"end\": 616, \"text_span\": \"ACl\", \"label\": \"GENE_OR_GENE_PRODUCT\"},\n"
+        "  {\"start\": 1137, \"end\": 1140, \"text_span\": \"ISC\", \"label\": \"CELL\"}\n"
+        "]\n"
         f"Text:\n{query}"
     )
+
     
     messages = [
         ChatMessage(role="system", content="You are a named entity recognition (NER) system. Respond only with a JSON list as told."),
@@ -52,18 +58,18 @@ for paper in papers:
     answer_text = extract_answer_after_think(raw_response)
     print("Debug answer text:", repr(answer_text))
     try:
-        entities = json.loads(answer_text)  
+        entities = json.loads(answer_text) 
         all_entities[paper['paper_id']] = {
             "text": query,
             "entities": entities
         }
-
     except Exception as e:
         print(f"JSON parse error: {e}, original text: {repr(answer_text)}")
-        all_entities[paper['paper_id']] = []  
+        all_entities[paper['paper_id']] = [] 
         
     print("Paper ID:", paper['paper_id'])
     print("the entities are ",entities)
+    # all_entities[paper['paper_id']] = entities
     
-with open('ner_entities_using_llm.json', 'w', encoding='utf-8') as f:
+with open('ner_entities_using_fewShots_llm.json', 'w', encoding='utf-8') as f:
     json.dump(all_entities, f, ensure_ascii=False, indent=2)
