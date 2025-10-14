@@ -9,11 +9,11 @@ import json
 df = pd.read_csv('new_sample.csv')
 print(df)
 print(df.columns)
-df = df.rename(columns={'Unnamed: 0' : 'paper_id', '0' : 'text'})
+df = df.rename(columns={'Unnamed: 0' : 'paper_id', '0' : 'title_abstract'})
 
 data = []
 for _, row in df.iterrows():
-    data.append({'paper_id': str(row['paper_id']), 'text': row['text']})
+    data.append({'paper_id': str(row['paper_id']), 'title_abstract': row['title_abstract']})
 
 
 with open('newSample_preprocess.json','w', encoding = 'utf-8') as f:

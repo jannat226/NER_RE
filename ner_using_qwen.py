@@ -17,17 +17,17 @@ all_entities = {}
 
 
 
-def extract_answer_after_think(text):
+def extract_answer_after_think(title_abstract):
     # remove  <think> ... </think> 
-    if '</think>' in text:
-        split_text = text.split('</think>')
-        return split_text[-1].strip()
-    return text.strip()
+    if '</think>' in title_abstract:
+        split_title_abstract = title_abstract.split('</think>')
+        return split_title_abstract[-1].strip()
+    return title_abstract.strip()
 
 for paper in papers:
-    query = paper['text']
+    query = paper['title_abstract']
     if not query.strip():
-        print("Warning: Empty text for paper_id:", paper['paper_id'])
+        print("Warning: Empty title_abstract for paper_id:", paper['paper_id'])
         
     prompt = (
         "Extract all named entities from the following text. "
@@ -54,7 +54,7 @@ for paper in papers:
     try:
         entities = json.loads(answer_text)  
         all_entities[paper['paper_id']] = {
-            "text": query,
+            "title_abstract": query,
             "entities": entities
         }
 
