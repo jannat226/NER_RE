@@ -29,14 +29,14 @@ for paper_id, paper_data in papers.items():
         print("Warning: Empty text for paper_id:", paper_data['paper_id'])
         
     prompt = (
-        ""
-        "Extract the relationship between the entities, the entities are identified from the abstracts of research papers, using the text from the abstract find the relationship between them"
+        "Extract the relationship between the entities, the entities are identified from the abstracts of research papers, using the text from the abstract find the relationship between them.\n"
         f'Given the following title and abstract:\n\n'
         f'"{paper_data["title_abstract"]}"\n\n'
         f"The identified entities are:\n"
-        + ", ".join([f'"{e["text_span"]}" [{e["label"]}]' for e in paper_data["entities"]]) +
-        "\n\nExtract relationships between these entities from the text."
-        "Return ONLY a JSON object with this format:"
+        + ", ".join([f'"{e.get("entity", e.get("text_span", ""))}" [{e["label"]}]' for e in paper_data["entities"]]) +
+        # + ", ".join([f'"{e["entity"]}" [{e["label"]}]' for e in paper_data["entities"]]) +
+        "\n\nExtract relationships between these entities from the text.\n"
+        "Return ONLY a JSON object with this format:\n"
         "{\n"
         '  "title_abstract": "<title and abstract text>",\n'
         '  "entities": [\n'
@@ -58,9 +58,8 @@ for paper_id, paper_data in papers.items():
         "Do not include any explanations or extra text."
     )
 
-    
 
-    
+
     messages = [
         ChatMessage(role="system", content="You are a relationship extraction (RE) system. Respond only with a JSON list as told."),
         ChatMessage(role="user", content=prompt),
@@ -71,18 +70,20 @@ for paper_id, paper_data in papers.items():
     answer_text = extract_answer_after_think(raw_response)
     print("Debug answer text:", repr(answer_text))
     try:
-        entities = json.loads(answer_text) 
-        all_entities[paper_id] = {
-            "title_abstract": query,
-            "entities": entities
-        }
+        # entities = json.loads(answer_text) 
+        # all_entities[paper_id] = {
+        #     "title_abstract": query,
+        #     "entities": entities
+        # }
+        relations_json = json.loads(answer_text)
+        all_entities[paper_id] = relations_json
     except Exception as e:
         print(f"JSON parse error: {e}, original text: {repr(answer_text)}")
-        all_entities[paper_id] = [] 
+        all_entities[paper_id] = {} 
         
     print("Paper ID:", {paper_id})
-    print("the entities are ",entities)
-    # all_entities[paper['paper_id']] = entities
+    print("the entities are ", relations_json)
+
     
 with open('re_using_qwen.json', 'w', encoding='utf-8') as f:
     json.dump(all_entities, f, ensure_ascii=False, indent=2)
